@@ -1,10 +1,10 @@
-FROM golang:1.24-alpine as build
+FROM golang:1.24.2-alpine as build
 
 WORKDIR /app
 
 ADD ./ /app
 
-RUN go build -o main ./cmd/rater/main.go
+RUN go build -o main ./cmd/upgrader/main.go
 
 FROM scratch
 
