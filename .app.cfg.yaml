@@ -1,0 +1,11 @@
+workers:
+  ### BTC
+  - from_topic: btc-blocks
+    to_websocket: /ws/btc/blocks
+  - from_topic: btc-transactions
+    to_websocket: /ws/btc/transactions
+  ### ETH
+  - from_topic: eth-blocks
+    to_websocket: /ws/eth/blocks
+  - from_topic: eth-transactions
+    to_websocket: /ws/eth/transactions
