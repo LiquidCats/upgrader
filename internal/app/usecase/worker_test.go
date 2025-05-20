@@ -21,7 +21,7 @@ import (
 )
 
 func TestWorker_Run(t *testing.T) {
-	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(time.Second))
+	ctx, cancel := context.WithDeadline(t.Context(), time.Now().Add(time.Second))
 	defer cancel()
 
 	cfg := configs.WorkerConfig{
@@ -60,5 +60,5 @@ func TestWorker_Run(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, websocket.TextMessage, msgType)
-	assert.Equal(t, `{"foo":"bar"}`, string(msg))
+	assert.JSONEq(t, `{"foo":"bar"}`, string(msg))
 }

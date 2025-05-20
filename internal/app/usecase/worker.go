@@ -36,7 +36,7 @@ func NewWorker(cfg configs.WorkerConfig, upgrader ws.Upgrader, subscriber bus.Su
 		router:     router,
 		upgrader:   upgrader,
 
-		relay: make(chan *entities.MessagePayload, 256),
+		relay: make(chan *entities.MessagePayload, 256), //nolint:mnd
 
 		wsClients: make(map[*websocket.Conn]bool),
 	}
