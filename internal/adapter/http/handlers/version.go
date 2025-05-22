@@ -8,10 +8,10 @@ import (
 )
 
 type APIHandler struct {
-	cfg configs.Workers
+	cfg configs.WorkersConfig
 }
 
-func NewAPIHandler(cfg configs.Workers) *APIHandler {
+func NewAPIHandler(cfg configs.WorkersConfig) *APIHandler {
 	return &APIHandler{cfg: cfg}
 }
 

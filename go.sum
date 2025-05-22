@@ -1,5 +1,5 @@
-github.com/LiquidCats/graceful v0.0.1 h1:Lwi841y9NbprecYY3mtT0uKiUeDl8sblEEbJuHha2ls=
-github.com/LiquidCats/graceful v0.0.1/go.mod h1:fZDk9ST2RbOMV6axhyUubb5f4BxiellENszK0VEVK74=
+github.com/LiquidCats/graceful v0.0.3 h1:+aTvtD4zJ2qtvd1WowUeo00ke+lt4FrQ6Qf2YFE1mLU=
+github.com/LiquidCats/graceful v0.0.3/go.mod h1:nCnPgIOejbSvagtnwKX2d8alVUbnfmnw1YIrc2YL7s0=
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
 github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6rlkpw=
 github.com/bsm/ginkgo/v2 v2.12.0 h1:Ny8MWAHyOepLGlLKYmXG4IEkioBysk6GpaRTLC8zwWs=

@@ -3,7 +3,7 @@ module github.com/LiquidCats/upgrader
 go 1.24.2
 
 require (
-	github.com/LiquidCats/graceful v0.0.1
+	github.com/LiquidCats/graceful v0.0.3
 	github.com/gin-gonic/gin v1.10.1
 	github.com/go-faster/errors v0.7.1
 	github.com/go-playground/sensitive v0.0.1
@@ -14,6 +14,7 @@ require (
 	github.com/rs/zerolog v1.34.0
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/automaxprocs v1.6.0
+	golang.org/x/sync v0.14.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -51,7 +52,6 @@ require (
 	golang.org/x/arch v0.17.0 // indirect
 	golang.org/x/crypto v0.38.0 // indirect
 	golang.org/x/net v0.40.0 // indirect
-	golang.org/x/sync v0.14.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.25.0 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect

@@ -1,7 +1,10 @@
 package configs
 
+import "github.com/LiquidCats/graceful"
+
 type Config struct {
-	App     AppConfig `envconfig:"APP" yaml:"app"`
-	Redis   Redis     `envconfig:"REDIS" yaml:"redis"`
-	Workers Workers   `envconfig:"WORKERS" yaml:"workers"`
+	App     AppConfig           `envconfig:"APP" yaml:"app"`
+	Http    graceful.HttpConfig `envconfig:"HTTP" yaml:"http"`
+	Redis   RedisConfig         `envconfig:"REDIS" yaml:"redis"`
+	Workers WorkersConfig       `envconfig:"WORKERS" yaml:"workers"`
 }

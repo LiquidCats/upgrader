@@ -6,8 +6,8 @@ import (
 
 	"github.com/LiquidCats/graceful"
 	"github.com/LiquidCats/upgrader/configs"
+	"github.com/LiquidCats/upgrader/internal/adapter/http"
 	"github.com/LiquidCats/upgrader/internal/adapter/http/handlers"
-	"github.com/LiquidCats/upgrader/internal/adapter/http/server"
 	"github.com/LiquidCats/upgrader/internal/adapter/metrics/prometheus"
 	"github.com/LiquidCats/upgrader/internal/app/services"
 	"github.com/redis/go-redis/v9"
@@ -39,14 +39,12 @@ func main() {
 		DB:       cfg.Redis.DB,
 	})
 
-	// exporter := prometheus.NewServer()
 	metrics := prometheus.NewMetrics(app)
 
 	rootHandler := handlers.NewRootHandler()
 	apiHandler := handlers.NewAPIHandler(cfg.Workers)
 
-	router := server.NewRouter()
-	srv := server.NewServer(cfg.App, router)
+	router := http.NewRouter()
 
 	router.Any("/", rootHandler.Handle)
 
@@ -55,8 +53,8 @@ func main() {
 
 	runners := []graceful.Runner{
 		graceful.Signals,
-		srv.Run,
-		// exporter.Run,
+		graceful.ServerRunner(router, cfg.Http),
+		prometheus.GerHandler(),
 	}
 
 	for _, workerCfg := range cfg.Workers {

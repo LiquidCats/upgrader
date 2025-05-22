@@ -1,6 +1,6 @@
 package configs
 
-type Workers []WorkerConfig
+type WorkersConfig []WorkerConfig
 
 type WorkerConfig struct {
 	FromTopic   string `yaml:"from_topic"`
