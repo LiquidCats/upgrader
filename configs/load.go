@@ -14,7 +14,7 @@ func Load(prefix string) (Config, error) {
 		return cfg, err
 	}
 
-	file, err := os.OpenFile(".app.config.yaml", os.O_RDONLY, 0666)
+	file, err := os.OpenFile(".app.cfg.yaml", os.O_RDONLY, 0666)
 	if err != nil {
 		return cfg, err
 	}

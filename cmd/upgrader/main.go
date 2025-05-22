@@ -6,17 +6,21 @@ import (
 
 	"github.com/LiquidCats/graceful"
 	"github.com/LiquidCats/upgrader/configs"
+	"github.com/LiquidCats/upgrader/internal/adapter/http/handlers"
 	"github.com/LiquidCats/upgrader/internal/adapter/http/server"
-	"github.com/LiquidCats/upgrader/internal/adapter/ws/upgrader"
-	"github.com/LiquidCats/upgrader/internal/app/usecase"
+	"github.com/LiquidCats/upgrader/internal/adapter/metrics/prometheus"
+	"github.com/LiquidCats/upgrader/internal/app/services"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog"
+
+	_ "go.uber.org/automaxprocs"
 )
 
 const app = "upgrader"
 
 func main() {
 	logger := zerolog.New(os.Stdout).With().Caller().Timestamp().Stack().Logger()
+
 	zerolog.DefaultContextLogger = &logger // nolint:reassign
 	ctx := logger.WithContext(context.Background())
 	ctx, cancel := context.WithCancel(ctx)
@@ -24,8 +28,10 @@ func main() {
 
 	cfg, err := configs.Load(app)
 	if err != nil {
-		logger.Error().Err(err).Msg("app: failed to load configuration")
+		logger.Fatal().Err(err).Msg("app: failed to load configuration")
 	}
+
+	zerolog.SetGlobalLevel(cfg.App.LogLevel)
 
 	redisClient := redis.NewClient(&redis.Options{
 		Addr:     cfg.Redis.Address,
@@ -33,24 +39,35 @@ func main() {
 		DB:       cfg.Redis.DB,
 	})
 
-	router := server.NewRouter()
-	wsUpgrader := upgrader.NewUpgrader()
+	//exporter := prometheus.NewServer()
+	metrics := prometheus.NewMetrics(app)
 
+	rootHandler := handlers.NewRootHandler()
+	apiHandler := handlers.NewApiHandler(cfg.Workers)
+
+	router := server.NewRouter()
 	srv := server.NewServer(cfg.App, router)
 
-	v1Group := router.Group("v1")
+	router.Any("/", rootHandler.Handle)
+
+	v1Group := router.Group("/v1")
+	v1Group.Any("/", apiHandler.Handle)
 
 	runners := []graceful.Runner{
 		graceful.Signals,
 		srv.Run,
+		//exporter.Run,
 	}
 
 	for _, workerCfg := range cfg.Workers {
 		pubSub := redisClient.Subscribe(ctx, workerCfg.FromTopic)
 
-		worker := usecase.NewWorker(workerCfg, wsUpgrader, pubSub, v1Group)
+		service := services.NewWebSocketService(workerCfg, pubSub)
+		handler := handlers.NewWsHandler(metrics, service)
 
-		runners = append(runners, worker.Run)
+		v1Group.Any(workerCfg.ToWebsocket, handler.Handle)
+
+		runners = append(runners, service.SubscribeIncomingMessages, service.SubscribeOutgoingMessages)
 	}
 
 	logger.Info().Msg("starting up")

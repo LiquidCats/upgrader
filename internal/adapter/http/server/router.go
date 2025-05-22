@@ -5,9 +5,10 @@ import (
 )
 
 func NewRouter() *gin.Engine {
-	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
 	router.Use(gin.Recovery())
+
+	gin.SetMode(gin.ReleaseMode)
 
 	return router
 }

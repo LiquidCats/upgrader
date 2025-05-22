@@ -1,5 +1,9 @@
 x-app-env: &app-env
-  GO: 1
+  GOMAXPROCS: 1
+  UPGRADER_APP_LOG_LEVEL: trace
+  UPGRADER_REDIS_ADDRESS: cache:6379
+  UPGRADER_REDIS_PASSWORD:
+  UPGRADER_REDIS_DB: 0
 
 services:
   dev:
@@ -15,6 +19,7 @@ services:
       - "8080:8080"
     volumes:
       - .:/app
+      - .app.cfg.yaml:/app/.app.cfg.yaml:ro
 
   cache:
     image: redis:alpine

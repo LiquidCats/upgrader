@@ -1,5 +1,8 @@
 package configs
 
+import "github.com/rs/zerolog"
+
 type AppConfig struct {
-	Port string `envconfig:"PORT" yaml:"port" default:"8080"`
+	LogLevel zerolog.Level `envconfig:"LOG_LEVEL" default:"info" default:"info"`
+	Port     string        `envconfig:"PORT" yaml:"port" default:"8080"`
 }
