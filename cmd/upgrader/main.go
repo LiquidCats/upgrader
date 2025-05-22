@@ -53,7 +53,7 @@ func main() {
 
 	runners := []graceful.Runner{
 		graceful.Signals,
-		graceful.ServerRunner(router, cfg.Http),
+		graceful.ServerRunner(router, cfg.HTTP),
 		prometheus.GerHandler(),
 	}
 
