@@ -7,8 +7,8 @@ import (
 )
 
 func GerHandler() graceful.Runner {
-	mux := gin.New()
 	gin.SetMode(gin.ReleaseMode)
+	mux := gin.New()
 
 	mux.Any("/metrics", func(c *gin.Context) {
 		promhttp.Handler().ServeHTTP(c.Writer, c.Request)
