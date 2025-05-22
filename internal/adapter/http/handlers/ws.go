@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"net/http"
-	"sync"
 	"time"
 
 	"github.com/LiquidCats/upgrader/internal/adapter/http/dto"
@@ -14,14 +13,12 @@ import (
 	"github.com/rs/zerolog"
 )
 
-var upgrader = websocket.Upgrader{
-	HandshakeTimeout:  30 * time.Second,
+var upgrader = websocket.Upgrader{ //nolint:gochecknoglobals
+	HandshakeTimeout:  30 * time.Second, //nolint:mnd
 	EnableCompression: true,
 }
 
 type WsHandler struct {
-	mu sync.RWMutex
-
 	metrics exporter.ConnectedClientsMetrics
 	srv     *services.WebSocketService
 }
@@ -59,10 +56,10 @@ func (h *WsHandler) Handle(c *gin.Context) {
 		logger.Info().Msg("client disconnected")
 	}()
 	//
-	//if err = conn.SetReadDeadline(time.Now().Add(15 * time.Second)); err != nil {
+	// if err = conn.SetReadDeadline(time.Now().Add(15 * time.Second)); err != nil {
 	//	return errors.Wrap(err, "could not set read deadline")
 	//}
-	//if err = conn.SetWriteDeadline(time.Now().Add(15 * time.Second)); err != nil {
+	// if err = conn.SetWriteDeadline(time.Now().Add(15 * time.Second)); err != nil {
 	//	return errors.Wrap(err, "failed to set connection deadline")
 	//}
 

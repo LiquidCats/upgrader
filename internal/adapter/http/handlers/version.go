@@ -7,15 +7,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type VersionHandler struct {
+type APIHandler struct {
 	cfg configs.Workers
 }
 
-func NewApiHandler(cfg configs.Workers) *VersionHandler {
-	return &VersionHandler{cfg: cfg}
+func NewAPIHandler(cfg configs.Workers) *APIHandler {
+	return &APIHandler{cfg: cfg}
 }
 
-func (h *VersionHandler) Handle(c *gin.Context) {
+func (h *APIHandler) Handle(c *gin.Context) {
 	var endpoints []string
 
 	for _, cfg := range h.cfg {

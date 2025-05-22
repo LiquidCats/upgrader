@@ -39,11 +39,11 @@ func main() {
 		DB:       cfg.Redis.DB,
 	})
 
-	//exporter := prometheus.NewServer()
+	// exporter := prometheus.NewServer()
 	metrics := prometheus.NewMetrics(app)
 
 	rootHandler := handlers.NewRootHandler()
-	apiHandler := handlers.NewApiHandler(cfg.Workers)
+	apiHandler := handlers.NewAPIHandler(cfg.Workers)
 
 	router := server.NewRouter()
 	srv := server.NewServer(cfg.App, router)
@@ -56,7 +56,7 @@ func main() {
 	runners := []graceful.Runner{
 		graceful.Signals,
 		srv.Run,
-		//exporter.Run,
+		// exporter.Run,
 	}
 
 	for _, workerCfg := range cfg.Workers {

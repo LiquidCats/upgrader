@@ -3,6 +3,7 @@ package prometheus
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -20,8 +21,9 @@ func NewServer() *Exporter {
 	mux.Any("/metrics", createHandler())
 
 	srv := &http.Server{
-		Addr:    "0.0.0.0:9100",
-		Handler: mux,
+		ReadHeaderTimeout: 5 * time.Second, //nolint:mnd
+		Addr:              "0.0.0.0:9100",
+		Handler:           mux,
 	}
 
 	return &Exporter{

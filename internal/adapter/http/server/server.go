@@ -40,9 +40,7 @@ func (s *Srv) Run(ctx context.Context) error {
 		}
 	}()
 
-	select {
-	case <-ctx.Done():
-	}
+	<-ctx.Done()
 
 	logger.Info().Msg("server: stopping server")
 

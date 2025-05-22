@@ -19,10 +19,13 @@ func Load(prefix string) (Config, error) {
 		return cfg, err
 	}
 
+	var workers Workers
 	decoder := yaml.NewDecoder(file)
-	if err = decoder.Decode(&cfg); err != nil {
+	if err = decoder.Decode(&workers); err != nil {
 		return cfg, err
 	}
+
+	cfg.Workers = workers
 
 	return cfg, nil
 }
