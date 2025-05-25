@@ -6,7 +6,8 @@ WORKDIR /app
 
 ADD ./ /app
 
-ENV GOFLAGS="-buildmode=pie"
+ENV CGO_ENABLED=0
+
 RUN go mod download
 RUN go build -o main ./cmd/upgrader/main.go
 
