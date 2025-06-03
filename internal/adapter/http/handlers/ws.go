@@ -28,40 +28,30 @@ func NewWsHandler(metrics exporter.ConnectedClientsMetrics, srv *services.WebSoc
 }
 
 func (h *WsHandler) Handle(c *gin.Context) {
-	logger := zerolog.Ctx(c).With().Str("websocket", c.Request.URL.Path).Logger()
-
-	logger.Debug().Msg("handling websocket connection")
-	defer logger.Debug().Msg("stopped handling websocket connection")
+	logger := zerolog.Ctx(c.Request.Context()).With().Str("websocket", c.Request.URL.Path).Logger()
 
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
 		c.AbortWithStatusJSON(
 			http.StatusExpectationFailed,
 			dto.ErrorResponse(
-				errors.Wrap(err, "connection cant be upgraded to websocket")))
+				errors.Wrap(err, "connection cant be upgraded to websocket"),
+			),
+		)
 		return
 	}
+	defer func() { _ = conn.Close() }()
 
 	logger = logger.With().Any("client_addr", conn.RemoteAddr()).Logger()
 
 	h.srv.AddClient(conn)
+	defer h.srv.RemoveClient(conn)
+
 	h.metrics.ConnectedClientInc(c.Request.URL.Path)
+	defer h.metrics.ConnectedClientDec(c.Request.URL.Path)
+
 	logger.Info().Msg("new client connected")
-
-	defer func() {
-		_ = conn.Close()
-
-		h.srv.RemoveClient(conn)
-		h.metrics.ConnectedClientDec(c.Request.URL.Path)
-		logger.Info().Msg("client disconnected")
-	}()
-	//
-	// if err = conn.SetReadDeadline(time.Now().Add(15 * time.Second)); err != nil {
-	//	return errors.Wrap(err, "could not set read deadline")
-	//}
-	// if err = conn.SetWriteDeadline(time.Now().Add(15 * time.Second)); err != nil {
-	//	return errors.Wrap(err, "failed to set connection deadline")
-	//}
+	defer logger.Info().Msg("client disconnected")
 
 	for {
 		if _, _, err = conn.NextReader(); err != nil {
