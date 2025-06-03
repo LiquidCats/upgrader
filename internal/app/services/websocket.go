@@ -7,6 +7,7 @@ import (
 	"github.com/LiquidCats/upgrader/configs"
 	"github.com/LiquidCats/upgrader/internal/app/domain/entities"
 	"github.com/LiquidCats/upgrader/internal/app/port/bus"
+	"github.com/LiquidCats/upgrader/internal/app/port/exporter"
 	"github.com/gorilla/websocket"
 	"github.com/rs/zerolog"
 )
@@ -20,15 +21,18 @@ type WebSocketService struct {
 
 	cfg        configs.WorkerConfig
 	subscriber bus.Subscriber
+	metrics    exporter.MessagesMetrics
 }
 
 func NewWebSocketService(
 	cfg configs.WorkerConfig,
 	subscriber bus.Subscriber,
+	metrics exporter.MessagesMetrics,
 ) *WebSocketService {
 	return &WebSocketService{
 		cfg:        cfg,
 		subscriber: subscriber,
+		metrics:    metrics,
 
 		relay: make(chan *entities.MessagePayload, 256), //nolint:mnd
 
@@ -103,6 +107,7 @@ func (srv *WebSocketService) SubscribeIncomingMessages(ctx context.Context) erro
 			if srv.clientLen() > 0 {
 				srv.mu.RLock()
 				srv.relay <- entities.NewMessagePayloadFrom(msg)
+				srv.metrics.ReceivedMessages(srv.cfg.FromTopic)
 				srv.mu.RUnlock()
 			}
 		}
@@ -128,5 +133,6 @@ func (srv *WebSocketService) handleOutgoingMessage(logger *zerolog.Logger, msg *
 			logger.Error().Err(err).Any("remote_addr", conn.RemoteAddr()).Msg("failed to send message to client")
 			continue
 		}
+		srv.metrics.SentMessagesInc(srv.cfg.ToWebsocket)
 	}
 }
