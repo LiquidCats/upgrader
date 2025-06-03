@@ -60,10 +60,10 @@ func main() {
 	for _, workerCfg := range cfg.Workers {
 		pubSub := redisClient.Subscribe(ctx, workerCfg.FromTopic)
 
-		service := services.NewWebSocketService(workerCfg, pubSub)
+		service := services.NewWebSocketService(workerCfg, pubSub, metrics)
 		handler := handlers.NewWsHandler(metrics, service)
 
-		v1Group.Any(workerCfg.ToWebsocket, handler.Handle)
+		v1Group.GET(workerCfg.ToWebsocket, handler.Handle)
 
 		runners = append(runners, service.SubscribeIncomingMessages, service.SubscribeOutgoingMessages)
 	}
