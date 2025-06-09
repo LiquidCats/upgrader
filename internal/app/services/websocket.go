@@ -41,21 +41,21 @@ func NewWebSocketService(
 }
 
 func (srv *WebSocketService) AddClient(ws *websocket.Conn) {
-	srv.mu.RLock()
-	defer srv.mu.RUnlock()
+	srv.mu.Lock()
+	defer srv.mu.Unlock()
 	srv.wsClients[ws] = true
 }
 
 func (srv *WebSocketService) RemoveClient(ws *websocket.Conn) {
-	srv.mu.RLock()
-	defer srv.mu.RUnlock()
+	srv.mu.Lock()
+	defer srv.mu.Unlock()
 	_ = ws.Close()
 	delete(srv.wsClients, ws)
 }
 
 func (srv *WebSocketService) clientLen() int {
-	srv.mu.Lock()
-	defer srv.mu.Unlock()
+	srv.mu.RLock()
+	defer srv.mu.RUnlock()
 
 	return len(srv.wsClients)
 }
