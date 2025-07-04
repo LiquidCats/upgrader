@@ -104,12 +104,12 @@ func (srv *WebSocketService) SubscribeIncomingMessages(ctx context.Context) erro
 				return nil
 			}
 
+			srv.mu.RLock()
 			if srv.clientLen() > 0 {
-				srv.mu.RLock()
 				srv.relay <- entities.NewMessagePayloadFrom(msg)
-				srv.metrics.ReceivedMessages(srv.cfg.FromTopic)
-				srv.mu.RUnlock()
 			}
+			srv.metrics.ReceivedMessages(srv.cfg.FromTopic)
+			srv.mu.RUnlock()
 		}
 	}
 }
