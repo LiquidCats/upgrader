@@ -2,55 +2,59 @@ package prometheus
 
 import (
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
-type Metrics struct {
-	connectedClients *prometheus.GaugeVec
-	sentMessages     *prometheus.CounterVec
-	receivedMessages *prometheus.CounterVec
+type ConnectedClient struct {
+	internal *prometheus.GaugeVec
 }
 
-func NewMetrics(name string) *Metrics {
-	connectedClients := prometheus.NewGaugeVec(prometheus.GaugeOpts{
-		Namespace: name,
-		Name:      "connected_clients_total",
-	}, []string{"websocket"})
-
-	sentMessages := prometheus.NewCounterVec(prometheus.CounterOpts{
-		Namespace: name,
-		Name:      "sent_messages_total",
-	}, []string{"websocket"})
-
-	receivedMessages := prometheus.NewCounterVec(prometheus.CounterOpts{
-		Namespace: name,
-		Name:      "received_messages_total",
-	}, []string{"channel"})
-
-	prometheus.MustRegister(
-		connectedClients,
-		sentMessages,
-		receivedMessages,
-	)
-
-	return &Metrics{
-		connectedClients: connectedClients,
-		sentMessages:     sentMessages,
-		receivedMessages: receivedMessages,
+func NewConnectedClient(name string) *ConnectedClient {
+	return &ConnectedClient{
+		internal: promauto.NewGaugeVec(prometheus.GaugeOpts{
+			Namespace: name,
+			Name:      "connected_clients_total",
+		}, []string{"websocket"}),
 	}
 }
 
-func (e *Metrics) ConnectedClientInc(websocket string) {
-	e.connectedClients.WithLabelValues(websocket).Inc()
+func (e *ConnectedClient) Inc(websocket string) {
+	e.internal.WithLabelValues(websocket).Inc()
+}
+func (e *ConnectedClient) Dec(websocket string) {
+	e.internal.WithLabelValues(websocket).Dec()
 }
 
-func (e *Metrics) ConnectedClientDec(websocket string) {
-	e.connectedClients.WithLabelValues(websocket).Dec()
+type SentMessages struct {
+	internal *prometheus.CounterVec
 }
 
-func (e *Metrics) SentMessagesInc(websocket string) {
-	e.sentMessages.WithLabelValues(websocket).Inc()
+func NewSentMessages(name string) *SentMessages {
+	return &SentMessages{
+		internal: promauto.NewCounterVec(prometheus.CounterOpts{
+			Namespace: name,
+			Name:      "sent_messages_total",
+		}, []string{"websocket"}),
+	}
 }
 
-func (e *Metrics) ReceivedMessages(channel string) {
-	e.receivedMessages.WithLabelValues(channel).Inc()
+func (e *SentMessages) Inc(websocket string) {
+	e.internal.WithLabelValues(websocket).Inc()
+}
+
+type ReceivedMessages struct {
+	internal *prometheus.CounterVec
+}
+
+func NewReceivedMessages(name string) *ReceivedMessages {
+	return &ReceivedMessages{
+		internal: promauto.NewCounterVec(prometheus.CounterOpts{
+			Namespace: name,
+			Name:      "received_messages_total",
+		}, []string{"websocket"}),
+	}
+}
+
+func (e *ReceivedMessages) Inc(websocket string) {
+	e.internal.WithLabelValues(websocket).Inc()
 }

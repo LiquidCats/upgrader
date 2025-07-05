@@ -19,11 +19,15 @@ var upgrader = websocket.Upgrader{ //nolint:gochecknoglobals
 }
 
 type WsHandler struct {
-	metrics exporter.ConnectedClientsMetrics
+	metrics WsHandlerMetrics
 	srv     *services.WebSocketService
 }
 
-func NewWsHandler(metrics exporter.ConnectedClientsMetrics, srv *services.WebSocketService) *WsHandler {
+type WsHandlerMetrics struct {
+	ConnectedClients exporter.ConnectedClientsMetric
+}
+
+func NewWsHandler(srv *services.WebSocketService, metrics WsHandlerMetrics) *WsHandler {
 	return &WsHandler{metrics: metrics, srv: srv}
 }
 
@@ -47,8 +51,8 @@ func (h *WsHandler) Handle(c *gin.Context) {
 	h.srv.AddClient(conn)
 	defer h.srv.RemoveClient(conn)
 
-	h.metrics.ConnectedClientInc(c.Request.URL.Path)
-	defer h.metrics.ConnectedClientDec(c.Request.URL.Path)
+	h.metrics.ConnectedClients.Inc(c.Request.URL.Path)
+	defer h.metrics.ConnectedClients.Dec(c.Request.URL.Path)
 
 	logger.Info().Msg("new client connected")
 	defer logger.Info().Msg("client disconnected")

@@ -1,11 +1,14 @@
 package exporter
 
-type ConnectedClientsMetrics interface {
-	ConnectedClientInc(websocket string)
-	ConnectedClientDec(websocket string)
+type ConnectedClientsMetric interface {
+	Inc(websocket string)
+	Dec(websocket string)
 }
 
-type MessagesMetrics interface {
-	SentMessagesInc(websocket string)
-	ReceivedMessages(channel string)
+type SentMessagesMetric interface {
+	Inc(websocket string)
+}
+
+type ReceivedMessagesMetric interface {
+	Inc(channel string)
 }

@@ -39,7 +39,9 @@ func main() {
 		DB:       cfg.Redis.DB,
 	})
 
-	metrics := prometheus.NewMetrics(app)
+	connectedClient := prometheus.NewConnectedClient(app)
+	sentMessages := prometheus.NewSentMessages(app)
+	receivedMessages := prometheus.NewReceivedMessages(app)
 
 	rootHandler := handlers.NewRootHandler()
 	apiHandler := handlers.NewAPIHandler(cfg.Workers)
@@ -60,12 +62,23 @@ func main() {
 	for _, workerCfg := range cfg.Workers {
 		pubSub := redisClient.Subscribe(ctx, workerCfg.FromTopic)
 
-		service := services.NewWebSocketService(workerCfg, pubSub, metrics)
-		handler := handlers.NewWsHandler(metrics, service)
+		service := services.NewWebSocketService(services.WebSocketServiceDeps{
+			Cfg:        configs.WorkerConfig{},
+			Subscriber: pubSub,
+			Metrics: services.WebSocketServiceMetrics{
+				ReceivedMessages: receivedMessages,
+				SentMessages:     sentMessages,
+			},
+		})
+		handler := handlers.NewWsHandler(service, handlers.WsHandlerMetrics{ConnectedClients: connectedClient})
 
 		v1Group.GET(workerCfg.ToWebsocket, handler.Handle)
 
-		runners = append(runners, service.SubscribeIncomingMessages, service.SubscribeOutgoingMessages)
+		runners = append(
+			runners,
+			service.SubscribeIncomingMessages,
+			service.SubscribeOutgoingMessages,
+		)
 	}
 
 	logger.Info().Msg("starting up")

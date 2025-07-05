@@ -12,6 +12,16 @@ import (
 	"github.com/rs/zerolog"
 )
 
+type WebSocketServiceMetrics struct {
+	ReceivedMessages exporter.ReceivedMessagesMetric
+	SentMessages     exporter.SentMessagesMetric
+}
+
+type WebSocketServiceDeps struct {
+	Cfg        configs.WorkerConfig
+	Subscriber bus.Subscriber
+	Metrics    WebSocketServiceMetrics
+}
 type WebSocketService struct {
 	mu sync.RWMutex
 
@@ -21,20 +31,16 @@ type WebSocketService struct {
 
 	cfg        configs.WorkerConfig
 	subscriber bus.Subscriber
-	metrics    exporter.MessagesMetrics
+	metrics    WebSocketServiceMetrics
 }
 
-func NewWebSocketService(
-	cfg configs.WorkerConfig,
-	subscriber bus.Subscriber,
-	metrics exporter.MessagesMetrics,
-) *WebSocketService {
+func NewWebSocketService(deps WebSocketServiceDeps) *WebSocketService {
 	return &WebSocketService{
-		cfg:        cfg,
-		subscriber: subscriber,
-		metrics:    metrics,
+		cfg:        deps.Cfg,
+		subscriber: deps.Subscriber,
+		metrics:    deps.Metrics,
 
-		relay: make(chan *entities.MessagePayload, 256), //nolint:mnd
+		relay: make(chan *entities.MessagePayload), //nolint:mnd
 
 		wsClients: make(map[*websocket.Conn]bool),
 	}
@@ -108,7 +114,7 @@ func (srv *WebSocketService) SubscribeIncomingMessages(ctx context.Context) erro
 			if srv.clientLen() > 0 {
 				srv.relay <- entities.NewMessagePayloadFrom(msg)
 			}
-			srv.metrics.ReceivedMessages(srv.cfg.FromTopic)
+			srv.metrics.ReceivedMessages.Inc(srv.cfg.FromTopic)
 			srv.mu.RUnlock()
 		}
 	}
@@ -133,6 +139,6 @@ func (srv *WebSocketService) handleOutgoingMessage(logger *zerolog.Logger, msg *
 			logger.Error().Err(err).Any("remote_addr", conn.RemoteAddr()).Msg("failed to send message to client")
 			continue
 		}
-		srv.metrics.SentMessagesInc(srv.cfg.ToWebsocket)
+		srv.metrics.SentMessages.Inc(srv.cfg.ToWebsocket)
 	}
 }
