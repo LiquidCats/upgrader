@@ -56,7 +56,7 @@ func main() {
 	runners := []graceful.Runner{
 		graceful.Signals,
 		graceful.ServerRunner(router, cfg.HTTP),
-		prometheus.GerHandler(),
+		graceful.ServerRunner(prometheus.GerHandler(), cfg.Metrics),
 	}
 
 	for _, workerCfg := range cfg.Workers {
