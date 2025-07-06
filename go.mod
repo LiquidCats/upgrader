@@ -4,6 +4,7 @@ go 1.24.2
 
 require (
 	github.com/LiquidCats/graceful v0.0.3
+	github.com/gin-contrib/logger v1.2.6
 	github.com/gin-gonic/contrib v0.0.0-20250521004450-2b1292699c15
 	github.com/gin-gonic/gin v1.10.1
 	github.com/go-faster/errors v0.7.1
