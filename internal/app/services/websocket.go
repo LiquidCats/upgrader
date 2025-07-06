@@ -13,8 +13,8 @@ import (
 )
 
 type WebSocketServiceMetrics struct {
-	ReceivedMessages exporter.ReceivedMessagesMetric
-	SentMessages     exporter.SentMessagesMetric
+	ReceivedMessages exporter.MessageCounterMetric
+	SentMessages     exporter.MessageCounterMetric
 }
 
 type WebSocketServiceDeps struct {

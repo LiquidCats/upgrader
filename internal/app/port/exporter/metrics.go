@@ -5,10 +5,6 @@ type ConnectedClientsMetric interface {
 	Dec(websocket string)
 }
 
-type SentMessagesMetric interface {
-	Inc(websocket string)
-}
-
-type ReceivedMessagesMetric interface {
+type MessageCounterMetric interface {
 	Inc(channel string)
 }
