@@ -49,8 +49,9 @@ func main() {
 	router := http.NewRouter()
 
 	router.Any("/", rootHandler.Handle)
+	router.Any("/api", rootHandler.Handle)
 
-	v1Group := router.Group("/v1")
+	v1Group := router.Group("/api/v1")
 	v1Group.Any("/", apiHandler.Handle)
 
 	runners := []graceful.Runner{
